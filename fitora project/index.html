@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FITORA — Elite Fitness & Nutrition Management System</title>
+  <meta name="description" content="Fitora is a premier web-based fitness and nutrition management platform. Track calories, protein, hydration, BMI, workouts, and personal health goals in a classy luxury dark-gold interface.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-black-gold">
+  <!-- ========================================================
+       AUTHENTICATION & USER SELECTION PORTAL
+       ======================================================== -->
+  <div class="auth-overlay hidden" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-logo-wrap">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <h2 class="auth-title">FIT<span class="gold-text">ORA</span></h2>
+        <p class="auth-sub">Elite Fitness & Nutrition Portal — Select or Create Your Athlete Profile</p>
+      </div>
+
+      <!-- Auth Navigation Tabs -->
+      <div class="auth-nav-tabs">
+        <button class="auth-tab-btn active" id="tabBtnSelectUser" onclick="app.setAuthTab('select')">👥 Switch / Login</button>
+        <button class="auth-tab-btn" id="tabBtnCreateUser" onclick="app.setAuthTab('register')">➕ Create New Athlete</button>
+      </div>
+
+      <!-- Panel 1: Select / Login to Existing User -->
+      <div class="auth-form-panel active" id="authPanelSelect">
+        <label class="form-label mb-2 block">Select Saved Athlete Account:</label>
+        <div class="user-account-list" id="authUsersList">
+          <!-- Populated dynamically via app.renderAuthUsersList() -->
+        </div>
+
+        <div class="mt-3">
+          <button class="btn btn-gold w-100" onclick="app.setAuthTab('register')">
+            + Register Brand New Athlete Account
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 2: Register New Athlete -->
+      <div class="auth-form-panel" id="authPanelRegister">
+        <form id="registerUserForm" onsubmit="event.preventDefault(); app.registerNewUser();">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="regName">Full Name / Athlete Name</label>
+              <input type="text" id="regName" class="form-input" placeholder="Enter your name" required autofocus>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regAge">Age (Years)</label>
+              <input type="number" id="regAge" class="form-input" min="12" max="100" value="25" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="regGender">Gender</label>
+              <select id="regGender" class="form-select">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regHeight">Height (cm)</label>
+              <div class="input-with-affix">
+                <input type="number" id="regHeight" class="form-input" min="100" max="250" value="175" required>
+                <span class="input-affix">cm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="regWeight">Current Weight (kg)</label>
+              <div class="input-with-affix">
+                <input type="number" id="regWeight" class="form-input" min="30" max="300" step="0.1" value="70.0" required>
+                <span class="input-affix">kg</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regTargetWeight">Goal Weight (kg)</label>
+              <div class="input-with-affix">
+                <input type="number" id="regTargetWeight" class="form-input" min="30" max="300" step="0.1" value="75.0" required>
+                <span class="input-affix">kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="regGoal">Primary Fitness Goal</label>
+              <select id="regGoal" class="form-select">
+                <option value="Muscle Gain" selected>Muscle Gain (Hypertrophy)</option>
+                <option value="Weight Loss">Weight Loss & Fat Burn</option>
+                <option value="Endurance">Athletic Endurance</option>
+                <option value="Maintenance">Health Maintenance</option>
+                <option value="Strength">Max Strength & Power</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regActivity">Activity Level</label>
+              <select id="regActivity" class="form-select">
+                <option value="1.2">Sedentary (Desk Job)</option>
+                <option value="1.375">Light (1-3 days/wk)</option>
+                <option value="1.55" selected>Moderate (3-5 days/wk)</option>
+                <option value="1.725">Heavy Training (6-7 days/wk)</option>
+                <option value="1.9">Elite Athlete</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regDiet">Dietary Preference</label>
+            <select id="regDiet" class="form-select">
+              <option value="High Protein Omnivore">High Protein Omnivore</option>
+              <option value="Vegetarian">Vegetarian (Dairy, Legumes)</option>
+              <option value="Vegan">Vegan (Plant Based)</option>
+              <option value="Keto">Keto / Low Carb</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Initial Tracker State:</label>
+            <div class="pill-selector">
+              <label class="pill-option active" id="regCleanTrackerOpt" onclick="app.setRegInitialData('clean')">
+                <span>✨ Brand New Clean Tracker (0 Logs)</span>
+              </label>
+              <label class="pill-option" id="regDemoTrackerOpt" onclick="app.setRegInitialData('demo')">
+                <span>📊 Include Demo Sample Logs</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-footer mt-4">
+            <button type="button" class="btn btn-outline" onclick="app.setAuthTab('select')">Cancel</button>
+            <button type="submit" class="btn btn-gold">Create Account & Enter FITORA</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Luxury Header & Navigation Bar -->
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand-group">
+        <div class="brand-logo" onclick="app.navigate('dashboard')">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">FIT<span class="gold-text">ORA</span></span>
+            <span class="brand-tagline">ELEVATE YOUR HEALTH</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="main-nav">
+        <button class="nav-btn active" data-tab="dashboard" onclick="app.navigate('dashboard')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-tab="bmi" onclick="app.navigate('bmi')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+          <span>BMI Calculator</span>
+        </button>
+        <button class="nav-btn" data-tab="calories" onclick="app.navigate('calories')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+          <span>Calorie & TDEE</span>
+        </button>
+        <button class="nav-btn" data-tab="nutrition" onclick="app.navigate('nutrition')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+          <span>Nutrition Log</span>
+        </button>
+        <button class="nav-btn" data-tab="protein" onclick="app.navigate('protein')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+          <span>Protein Monitor</span>
+        </button>
+        <button class="nav-btn" data-tab="water" onclick="app.navigate('water')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          <span>Water Tracker</span>
+        </button>
+        <button class="nav-btn" data-tab="workouts" onclick="app.navigate('workouts')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 5v14M18 5v14M2 9h4M18 9h4M2 15h4M18 15h4M6 12h12"></path></svg>
+          <span>Workout Planner</span>
+        </button>
+        <button class="nav-btn" data-tab="profile" onclick="app.navigate('profile')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span>Profile & Goals</span>
+        </button>
+      </nav>
+
+      <!-- Quick User Action & Mobile Hamburger -->
+      <div class="header-actions">
+        <div class="user-pill" onclick="app.navigate('profile')" title="View Active Profile">
+          <div class="avatar-glow">
+            <span id="headerUserInitials">FA</span>
+          </div>
+          <div class="user-meta">
+            <span class="user-meta-name" id="headerUserName">Fit Athlete</span>
+            <span class="user-meta-goal" id="headerUserGoal">Muscle Gain</span>
+          </div>
+        </div>
+        <div class="header-user-controls">
+          <button class="btn-header-action" onclick="app.openAuthModal('select')" title="Switch Athlete Profile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Switch</span>
+          </button>
+          <button class="btn-header-action btn-header-logout" onclick="app.logout()" title="Log out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Logout</span>
+          </button>
+        </div>
+        <button class="mobile-menu-toggle" id="mobileMenuBtn" onclick="app.toggleMobileMenu()" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <span class="gold-text font-bold">FITORA MENU</span>
+      <button class="drawer-close" onclick="app.toggleMobileMenu()">&times;</button>
+    </div>
+    <div class="drawer-links">
+      <button class="drawer-link active" onclick="app.navigateMobile('dashboard')">📊 Dashboard</button>
+      <button class="drawer-link" onclick="app.navigateMobile('bmi')">⚖️ BMI Calculator</button>
+      <button class="drawer-link" onclick="app.navigateMobile('calories')">🔥 Calorie & TDEE</button>
+      <button class="drawer-link" onclick="app.navigateMobile('nutrition')">🥗 Nutrition Tracking</button>
+      <button class="drawer-link" onclick="app.navigateMobile('protein')">🥩 Protein Intake</button>
+      <button class="drawer-link" onclick="app.navigateMobile('water')">💧 Water Intake</button>
+      <button class="drawer-link" onclick="app.navigateMobile('workouts')">🏋️‍♂️ Workout Planner</button>
+      <button class="drawer-link" onclick="app.navigateMobile('profile')">👤 Personal Profile</button>
+      <div style="border-top: 1px solid var(--border-subtle); margin: 0.5rem 0;"></div>
+      <button class="drawer-link" onclick="app.openAuthModal('select'); app.toggleMobileMenu(false);">👥 Switch Athlete</button>
+      <button class="drawer-link" onclick="app.openAuthModal('register'); app.toggleMobileMenu(false);">➕ Register New User</button>
+      <button class="drawer-link text-red" onclick="app.logout(); app.toggleMobileMenu(false);">🚪 Log Out</button>
+    </div>
+  </div>
+
+  <!-- Toast / Notification banner -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main Content Wrapper -->
+  <main class="app-main">
+
+    <!-- ========================================================
+         VIEW 1: DASHBOARD
+         ======================================================== -->
+    <section class="view-panel active" id="view-dashboard">
+      <div class="container">
+        <!-- Welcome Hero Banner -->
+        <div class="dashboard-hero card-gold-glow">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="dot-live"></span>
+              <span>LIVE HEALTH MONITOR</span>
+            </div>
+            <h1 class="hero-title">Welcome back, <span class="gold-text" id="dashGreetingName">Athlete</span>!</h1>
+            <p class="hero-subtitle" id="dashMotivation">“Consistency is the foundation of peak performance. Let's conquer today's targets!”</p>
+            <div class="hero-tags">
+              <span class="badge-tag" id="dashTagGoal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Goal: Muscle Gain</span>
+              <span class="badge-tag" id="dashTagCalories"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Target: 2,450 kcal</span>
+              <span class="badge-tag" id="dashTagStreak"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 5 Day Streak</span>
+            </div>
+          </div>
+          <div class="hero-quick-actions">
+            <button class="btn btn-gold" onclick="app.openModal('quickLogModal')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Quick Log Activity
+            </button>
+            <button class="btn btn-outline" onclick="app.navigate('workouts')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 5v14M18 5v14M2 9h4M18 9h4M2 15h4M18 15h4M6 12h12"/></svg>
+              Start Workout
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric KPI Cards Grid -->
+        <div class="kpi-grid">
+          <!-- KPI 1: Calories Consumed vs Target -->
+          <div class="kpi-card card">
+            <div class="kpi-header">
+              <div class="kpi-icon gold-bg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              </div>
+              <span class="kpi-title">Daily Calories</span>
+              <span class="kpi-badge" id="dashCalPercent">68%</span>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value-group">
+                <span class="kpi-main-val" id="dashCalEaten">1,680</span>
+                <span class="kpi-sub-val">/ <span id="dashCalGoal">2,450</span> kcal</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill gold-gradient" id="dashCalBar" style="width: 68%;"></div>
+              </div>
+              <div class="kpi-footer-note">
+                <span id="dashCalRemaining" class="gold-text">770 kcal</span> remaining today
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 2: Protein Intake -->
+          <div class="kpi-card card">
+            <div class="kpi-header">
+              <div class="kpi-icon gold-bg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+              </div>
+              <span class="kpi-title">Protein Intake</span>
+              <span class="kpi-badge" id="dashProteinPercent">75%</span>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value-group">
+                <span class="kpi-main-val" id="dashProteinEaten">120</span>
+                <span class="kpi-sub-val">/ <span id="dashProteinGoal">160</span> g</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill gold-gradient" id="dashProteinBar" style="width: 75%;"></div>
+              </div>
+              <div class="kpi-footer-note">
+                <span id="dashProteinRemaining" class="gold-text">40g</span> to meet muscle target
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 3: Water Hydration -->
+          <div class="kpi-card card">
+            <div class="kpi-header">
+              <div class="kpi-icon blue-bg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+              </div>
+              <span class="kpi-title">Water Hydration</span>
+              <span class="kpi-badge" id="dashWaterPercent">80%</span>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value-group">
+                <span class="kpi-main-val" id="dashWaterDrank">2,400</span>
+                <span class="kpi-sub-val">/ <span id="dashWaterGoal">3,000</span> ml</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill blue-gradient" id="dashWaterBar" style="width: 80%;"></div>
+              </div>
+              <div class="kpi-footer-actions">
+                <span><span id="dashWaterGlasses">9.6</span> of 12 glasses</span>
+                <button class="btn-micro" onclick="app.quickAddWater(250)">+250ml</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Workouts & Active Burn -->
+          <div class="kpi-card card">
+            <div class="kpi-header">
+              <div class="kpi-icon red-bg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </div>
+              <span class="kpi-title">Active Burn</span>
+              <span class="kpi-badge" id="dashWorkoutBadge">Completed</span>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value-group">
+                <span class="kpi-main-val" id="dashBurnedCalories">480</span>
+                <span class="kpi-sub-val">kcal burned</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill red-gradient" id="dashWorkoutBar" style="width: 90%;"></div>
+              </div>
+              <div class="kpi-footer-note">
+                <span id="dashWorkoutCount">1 session</span> logged today (45 mins)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Multi-Col Section: Nutrition & Activity Breakdown -->
+        <div class="dash-columns-grid">
+          <!-- Left Column: Macros Distribution Card -->
+          <div class="card dash-macros-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-tag">MACRONUTRIENTS</span>
+                <h2 class="card-title">Daily Nutrition Split</h2>
+              </div>
+              <button class="btn-icon-subtle" onclick="app.navigate('nutrition')" title="Go to Nutrition">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            
+            <div class="macro-donut-wrapper">
+              <div class="macro-donut-container">
+                <svg viewBox="0 0 160 160" class="donut-svg">
+                  <!-- Donut background circle -->
+                  <circle cx="80" cy="80" r="62" class="donut-bg-ring"></circle>
+                  <!-- SVG Segments with strokes -->
+                  <circle cx="80" cy="80" r="62" class="donut-segment donut-seg-protein" id="donutProteinSeg"></circle>
+                  <circle cx="80" cy="80" r="62" class="donut-segment donut-seg-carbs" id="donutCarbsSeg"></circle>
+                  <circle cx="80" cy="80" r="62" class="donut-segment donut-seg-fats" id="donutFatsSeg"></circle>
+                </svg>
+                <div class="donut-center-label">
+                  <span class="donut-center-cal" id="donutCenterCal">1,680</span>
+                  <span class="donut-center-sub">KCAL TOTAL</span>
+                </div>
+              </div>
+
+              <div class="macro-legend-list">
+                <div class="macro-legend-item">
+                  <div class="legend-color-box bg-gold"></div>
+                  <div class="legend-info">
+                    <span class="legend-name">Protein</span>
+                    <span class="legend-vals"><strong id="dashMacroProteinG">120g</strong> <span class="text-dim">(<span id="dashMacroProteinPct">30%</span>)</span></span>
+                  </div>
+                </div>
+                <div class="macro-legend-item">
+                  <div class="legend-color-box bg-cyan"></div>
+                  <div class="legend-info">
+                    <span class="legend-name">Carbohydrates</span>
+                    <span class="legend-vals"><strong id="dashMacroCarbsG">185g</strong> <span class="text-dim">(<span id="dashMacroCarbsPct">45%</span>)</span></span>
+                  </div>
+                </div>
+                <div class="macro-legend-item">
+                  <div class="legend-color-box bg-amber"></div>
+                  <div class="legend-info">
+                    <span class="legend-name">Healthy Fats</span>
+                    <span class="legend-vals"><strong id="dashMacroFatsG">48g</strong> <span class="text-dim">(<span id="dashMacroFatsPct">25%</span>)</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Health & BMI Mini Summary -->
+            <div class="dash-bmi-summary">
+              <div class="bmi-summary-item">
+                <span class="mini-label">BMI SCORE</span>
+                <span class="mini-val gold-text" id="dashBmiScore">23.4</span>
+              </div>
+              <div class="bmi-summary-item">
+                <span class="mini-label">CATEGORY</span>
+                <span class="mini-val text-green" id="dashBmiCategory">Normal Weight</span>
+              </div>
+              <div class="bmi-summary-item">
+                <span class="mini-label">CURRENT WEIGHT</span>
+                <span class="mini-val" id="dashCurrentWeight">72.0 kg</span>
+              </div>
+              <div class="bmi-summary-item">
+                <span class="mini-label">TARGET WEIGHT</span>
+                <span class="mini-val gold-text" id="dashTargetWeight">76.0 kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Today's Schedule & Recent Activity -->
+          <div class="card dash-activity-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-tag">ACTIVITY TIMELINE</span>
+                <h2 class="card-title">Today's Fitness Log</h2>
+              </div>
+              <button class="btn btn-outline-sm" onclick="app.openModal('quickLogModal')">+ Add Entry</button>
+            </div>
+
+            <div class="activity-timeline" id="dashTimeline">
+              <!-- Dynamically rendered timeline entries -->
+            </div>
+
+            <!-- Personalized Health Recommendations -->
+            <div class="recommendations-box">
+              <div class="rec-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              </div>
+              <div class="rec-text">
+                <h4 class="rec-title">Fitora Smart Recommendation</h4>
+                <p class="rec-desc" id="dashSmartRec">You are 40g short of your daily protein target. Consider a Greek yogurt bowl, grilled chicken breast, or whey protein shake after your training session.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 2: BMI CALCULATOR
+         ======================================================== -->
+    <section class="view-panel" id="view-bmi">
+      <div class="container">
+        <div class="section-title-wrap">
+          <span class="section-badge">BODY COMPOSITION</span>
+          <h1 class="section-title">Body Mass Index <span class="gold-text">(BMI)</span> Calculator</h1>
+          <p class="section-desc">Assess your weight status according to World Health Organization (WHO) standards, calculate your ideal healthy weight window, and receive targeted health recommendations.</p>
+        </div>
+
+        <div class="calc-grid">
+          <!-- Left: Input Form Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Enter Measurements</h2>
+              <div class="unit-toggle">
+                <button class="unit-btn active" id="bmiUnitMetric" onclick="app.setBmiUnits('metric')">Metric (kg / cm)</button>
+                <button class="unit-btn" id="bmiUnitImperial" onclick="app.setBmiUnits('imperial')">Imperial (lbs / ft-in)</button>
+              </div>
+            </div>
+
+            <form id="bmiForm" onsubmit="event.preventDefault(); app.calculateBMI();">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Gender</label>
+                  <div class="pill-selector">
+                    <label class="pill-option active" id="bmiGenderMale" onclick="app.setBmiGender('male')">
+                      <input type="radio" name="bmiGender" value="male" checked hidden>
+                      <span>♂ Male</span>
+                    </label>
+                    <label class="pill-option" id="bmiGenderFemale" onclick="app.setBmiGender('female')">
+                      <input type="radio" name="bmiGender" value="female" hidden>
+                      <span>♀ Female</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="bmiAge">Age (Years)</label>
+                  <input type="number" id="bmiAge" class="form-input" min="10" max="110" value="25" required>
+                </div>
+              </div>
+
+              <!-- Metric Inputs -->
+              <div id="bmiMetricInputs">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="bmiHeight">Height (cm)</label>
+                    <div class="input-with-affix">
+                      <input type="number" id="bmiHeight" class="form-input" min="80" max="250" step="0.5" value="175" required oninput="app.calculateBMI()">
+                      <span class="input-affix">cm</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="bmiWeight">Weight (kg)</label>
+                    <div class="input-with-affix">
+                      <input type="number" id="bmiWeight" class="form-input" min="20" max="300" step="0.1" value="72" required oninput="app.calculateBMI()">
+                      <span class="input-affix">kg</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Imperial Inputs (Hidden by default) -->
+              <div id="bmiImperialInputs" style="display: none;">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Height (Feet & Inches)</label>
+                    <div class="grid-2-col">
+                      <div class="input-with-affix">
+                        <input type="number" id="bmiHeightFeet" class="form-input" min="3" max="8" value="5" oninput="app.calculateBMI()">
+                        <span class="input-affix">ft</span>
+                      </div>
+                      <div class="input-with-affix">
+                        <input type="number" id="bmiHeightInches" class="form-input" min="0" max="11" value="9" oninput="app.calculateBMI()">
+                        <span class="input-affix">in</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="bmiWeightLbs">Weight (lbs)</label>
+                    <div class="input-with-affix">
+                      <input type="number" id="bmiWeightLbs" class="form-input" min="50" max="660" step="0.5" value="158.7" oninput="app.calculateBMI()">
+                      <span class="input-affix">lbs</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions mt-3">
+                <button type="submit" class="btn btn-gold w-100">Calculate BMI & Health Analysis</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Visual Results Card -->
+          <div class="card card-gold-glow">
+            <div class="card-header">
+              <h2 class="card-title">Diagnostic Results</h2>
+              <span class="badge-tag gold-border" id="bmiStatusBadge">Normal Weight</span>
+            </div>
+
+            <div class="bmi-result-display">
+              <div class="bmi-circle-gauge">
+                <div class="bmi-score-number" id="bmiScoreText">23.5</div>
+                <div class="bmi-score-unit">kg/m²</div>
+              </div>
+
+              <div class="bmi-category-title" id="bmiCategoryTitle">Healthy & Balanced Weight</div>
+              <p class="bmi-category-desc" id="bmiCategoryDesc">Your body mass index is in the optimal range. Maintaining this balance reduces cardiovascular risk and supports longevity.</p>
+
+              <!-- Color Scale Meter Bar -->
+              <div class="bmi-meter-wrap">
+                <div class="bmi-meter-bar">
+                  <div class="meter-segment seg-under" title="Underweight (< 18.5)"></div>
+                  <div class="meter-segment seg-normal" title="Normal (18.5 - 24.9)"></div>
+                  <div class="meter-segment seg-over" title="Overweight (25 - 29.9)"></div>
+                  <div class="meter-segment seg-obese" title="Obese (≥ 30)"></div>
+                  <div class="bmi-meter-pointer" id="bmiMeterPointer" style="left: 42%;">
+                    <div class="pointer-arrow"></div>
+                    <span class="pointer-label" id="pointerLabel">23.5</span>
+                  </div>
+                </div>
+                <div class="bmi-meter-labels">
+                  <span>16.0</span>
+                  <span>18.5</span>
+                  <span>25.0</span>
+                  <span>30.0</span>
+                  <span>40.0</span>
+                </div>
+              </div>
+
+              <!-- Healthy Range & Actionable Advice -->
+              <div class="bmi-stats-cards">
+                <div class="sub-stat-box">
+                  <span class="sub-stat-label">Ideal Weight Window</span>
+                  <span class="sub-stat-val gold-text" id="bmiIdealWeight">56.7 – 76.3 kg</span>
+                </div>
+                <div class="sub-stat-box">
+                  <span class="sub-stat-label">Difference to Median</span>
+                  <span class="sub-stat-val" id="bmiWeightDiff">+5.5 kg (Ideal)</span>
+                </div>
+                <div class="sub-stat-box">
+                  <span class="sub-stat-label">Prime Fitness Category</span>
+                  <span class="sub-stat-val" id="bmiPrimeCategory">Endurance / Athlete</span>
+                </div>
+              </div>
+
+              <div class="bmi-actions mt-3">
+                <button class="btn btn-outline w-100" onclick="app.applyBmiToProfile()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+                  Save Metrics to My Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WHO BMI Classification Table -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3 class="card-title">World Health Organization (WHO) BMI Classification</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="luxury-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>BMI Range (kg/m²)</th>
+                  <th>Health Risk Profile</th>
+                  <th>Primary Recommendations</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="tableRowUnder">
+                  <td><span class="badge-status badge-blue">Underweight</span></td>
+                  <td>&lt; 18.5</td>
+                  <td>Nutritional deficiency, weakened immunity, osteoporosis risk</td>
+                  <td>Caloric surplus with nutrient-dense meals & resistance training</td>
+                </tr>
+                <tr id="tableRowNormal" class="row-highlight-gold">
+                  <td><span class="badge-status badge-gold">Normal / Healthy</span></td>
+                  <td>18.5 – 24.9</td>
+                  <td>Lowest risk of chronic conditions, optimal cardiovascular health</td>
+                  <td>Maintain balanced macros, strength conditioning, aerobic fitness</td>
+                </tr>
+                <tr id="tableRowOver">
+                  <td><span class="badge-status badge-orange">Overweight</span></td>
+                  <td>25.0 – 29.9</td>
+                  <td>Elevated risk for hypertension, insulin resistance, joint stress</td>
+                  <td>Moderate caloric deficit (300-500 kcal) with daily cardio & lifting</td>
+                </tr>
+                <tr id="tableRowObese">
+                  <td><span class="badge-status badge-red">Obese (Class I-III)</span></td>
+                  <td>&ge; 30.0</td>
+                  <td>High risk of Type 2 diabetes, heart disease, sleep apnea</td>
+                  <td>Structured lifestyle protocol, medical supervision, sustainable diet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 3: CALORIE & TDEE CALCULATOR
+         ======================================================== -->
+    <section class="view-panel" id="view-calories">
+      <div class="container">
+        <div class="section-title-wrap">
+          <span class="section-badge">ENERGY EXPENDITURE</span>
+          <h1 class="section-title">Calorie & TDEE <span class="gold-text">Expenditure Calculator</span></h1>
+          <p class="section-desc">Compute your Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE) using the scientifically validated Mifflin-St Jeor formula, tailored to your exact training intensity and physique goal.</p>
+        </div>
+
+        <div class="calc-grid">
+          <!-- Left: Input Form Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Biometric Parameters</h2>
+            </div>
+
+            <form id="tdeeForm" onsubmit="event.preventDefault(); app.calculateTDEE();">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Biological Sex</label>
+                  <div class="pill-selector">
+                    <label class="pill-option active" id="tdeeSexMale" onclick="app.setTdeeSex('male')">
+                      <span>♂ Male</span>
+                    </label>
+                    <label class="pill-option" id="tdeeSexFemale" onclick="app.setTdeeSex('female')">
+                      <span>♀ Female</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="tdeeAge">Age (Years)</label>
+                  <input type="number" id="tdeeAge" class="form-input" min="12" max="110" value="25" required oninput="app.calculateTDEE()">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="tdeeHeight">Height (cm)</label>
+                  <div class="input-with-affix">
+                    <input type="number" id="tdeeHeight" class="form-input" min="100" max="250" value="175" required oninput="app.calculateTDEE()">
+                    <span class="input-affix">cm</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="tdeeWeight">Weight (kg)</label>
+                  <div class="input-with-affix">
+                    <input type="number" id="tdeeWeight" class="form-input" min="30" max="250" step="0.1" value="72" required oninput="app.calculateTDEE()">
+                    <span class="input-affix">kg</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="tdeeActivity">Physical Activity Level</label>
+                <select id="tdeeActivity" class="form-select" onchange="app.calculateTDEE()">
+                  <option value="1.2">Sedentary (Desk job, little to no exercise)</option>
+                  <option value="1.375">Light Activity (Exercise 1-3 days/week)</option>
+                  <option value="1.55" selected>Moderate Activity (Exercise 3-5 days/week)</option>
+                  <option value="1.725">Heavy Training (Hard exercise 6-7 days/week)</option>
+                  <option value="1.9">Athlete / Extreme (Physical job + intense 2x daily training)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="tdeeGoal">Physique & Health Target</label>
+                <select id="tdeeGoal" class="form-select" onchange="app.calculateTDEE()">
+                  <option value="aggressive_cut">Aggressive Fat Loss (-500 kcal / day)</option>
+                  <option value="mild_cut">Moderate Fat Loss (-300 kcal / day)</option>
+                  <option value="maintain">Maintenance (Weight equilibrium)</option>
+                  <option value="lean_bulk" selected>Lean Muscle Bulk (+300 kcal / day)</option>
+                  <option value="heavy_bulk">Aggressive Muscle Bulk (+500 kcal / day)</option>
+                </select>
+              </div>
+
+              <div class="mt-3">
+                <button type="button" class="btn btn-gold w-100" onclick="app.calculateTDEE(); app.applyTdeeToProfile();">
+                  Save Targets as My Active Plan
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Output Card -->
+          <div class="card card-gold-glow">
+            <div class="card-header">
+              <h2 class="card-title">Calculated Energy Profile</h2>
+              <span class="badge-tag gold-border" id="tdeeGoalBadge">Lean Muscle Bulk</span>
+            </div>
+
+            <div class="tdee-results-layout">
+              <!-- BMR and TDEE Dual Highlights -->
+              <div class="tdee-dual-boxes">
+                <div class="tdee-stat-pill">
+                  <span class="stat-pill-label">BMR (Basal Rate)</span>
+                  <span class="stat-pill-val" id="tdeeBmrVal">1,705</span>
+                  <span class="stat-pill-unit">kcal / day resting</span>
+                </div>
+                <div class="tdee-stat-pill pill-gold">
+                  <span class="stat-pill-label">TDEE (Maintenance)</span>
+                  <span class="stat-pill-val gold-text" id="tdeeTdeeVal">2,642</span>
+                  <span class="stat-pill-unit">kcal / day burned</span>
+                </div>
+              </div>
+
+              <!-- Recommended Daily Target Box -->
+              <div class="target-calorie-card">
+                <span class="target-card-subtitle">YOUR TARGET DAILY INTAKE</span>
+                <div class="target-card-number">
+                  <span class="big-gold-number" id="tdeeTargetVal">2,942</span>
+                  <span class="unit-text">KCAL / DAY</span>
+                </div>
+                <p class="target-card-note" id="tdeeTargetDesc">Surplus of +300 kcal optimizes muscle protein synthesis with minimal fat accumulation.</p>
+              </div>
+
+              <!-- Macro Breakdown for this target -->
+              <h3 class="sub-heading mt-3">Target Macronutrient Distribution</h3>
+              <div class="macro-target-grid">
+                <div class="macro-target-box box-protein">
+                  <span class="macro-target-title">PROTEIN</span>
+                  <span class="macro-target-g" id="tdeeMacroProteinG">162g</span>
+                  <span class="macro-target-sub" id="tdeeMacroProteinSub">648 kcal (22%)</span>
+                </div>
+                <div class="macro-target-box box-carbs">
+                  <span class="macro-target-title">CARBS</span>
+                  <span class="macro-target-g" id="tdeeMacroCarbsG">368g</span>
+                  <span class="macro-target-sub" id="tdeeMacroCarbsSub">1,471 kcal (50%)</span>
+                </div>
+                <div class="macro-target-box box-fats">
+                  <span class="macro-target-title">FATS</span>
+                  <span class="macro-target-g" id="tdeeMacroFatsG">92g</span>
+                  <span class="macro-target-sub" id="tdeeMacroFatsSub">823 kcal (28%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 4: NUTRITION TRACKING
+         ======================================================== -->
+    <section class="view-panel" id="view-nutrition">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="section-header-row">
+            <div>
+              <span class="section-badge">DAILY FUEL</span>
+              <h1 class="section-title">Nutrition & Macro <span class="gold-text">Tracking</span></h1>
+              <p class="section-desc">Log your meals, monitor carb/protein/fat splits, and access our preloaded library of nutritious whole foods.</p>
+            </div>
+            <div class="section-actions">
+              <button class="btn btn-gold" onclick="app.openModal('addFoodModal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Log Meal / Food
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nutrition Macro Bar Summary -->
+        <div class="card card-gold-glow mb-4">
+          <div class="nutrition-summary-bar">
+            <div class="summary-col">
+              <span class="col-lbl">Calories Consumed</span>
+              <span class="col-val gold-text"><span id="nutriCalTotal">1,680</span> / <span id="nutriCalGoal">2,450</span> kcal</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill gold-gradient" id="nutriCalBar" style="width: 68%;"></div></div>
+            </div>
+            <div class="summary-col">
+              <span class="col-lbl">Protein (g)</span>
+              <span class="col-val text-gold"><span id="nutriProteinTotal">120</span> / <span id="nutriProteinGoal">160</span> g</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill gold-gradient" id="nutriProteinBar" style="width: 75%;"></div></div>
+            </div>
+            <div class="summary-col">
+              <span class="col-lbl">Carbs (g)</span>
+              <span class="col-val text-cyan"><span id="nutriCarbsTotal">185</span> / <span id="nutriCarbsGoal">260</span> g</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill cyan-gradient" id="nutriCarbsBar" style="width: 71%;"></div></div>
+            </div>
+            <div class="summary-col">
+              <span class="col-lbl">Fats (g)</span>
+              <span class="col-val text-amber"><span id="nutriFatsTotal">48</span> / <span id="nutriFatsGoal">68</span> g</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill amber-gradient" id="nutriFatsBar" style="width: 70%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meal Slots (Breakfast, Lunch, Dinner, Snacks) -->
+        <div class="meals-grid">
+          <!-- Breakfast -->
+          <div class="card meal-card">
+            <div class="meal-card-header">
+              <div class="meal-type-title">
+                <span class="meal-icon">🌅</span>
+                <div>
+                  <h3 class="meal-name">Breakfast</h3>
+                  <span class="meal-sub" id="breakfastCalories">450 kcal</span>
+                </div>
+              </div>
+              <button class="btn-micro" onclick="app.openModal('addFoodModal', 'Breakfast')">+ Add Food</button>
+            </div>
+            <div class="meal-items-list" id="breakfastItems">
+              <!-- Items injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Lunch -->
+          <div class="card meal-card">
+            <div class="meal-card-header">
+              <div class="meal-type-title">
+                <span class="meal-icon">☀️</span>
+                <div>
+                  <h3 class="meal-name">Lunch</h3>
+                  <span class="meal-sub" id="lunchCalories">620 kcal</span>
+                </div>
+              </div>
+              <button class="btn-micro" onclick="app.openModal('addFoodModal', 'Lunch')">+ Add Food</button>
+            </div>
+            <div class="meal-items-list" id="lunchItems">
+              <!-- Items injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Dinner -->
+          <div class="card meal-card">
+            <div class="meal-card-header">
+              <div class="meal-type-title">
+                <span class="meal-icon">🌙</span>
+                <div>
+                  <h3 class="meal-name">Dinner</h3>
+                  <span class="meal-sub" id="dinnerCalories">480 kcal</span>
+                </div>
+              </div>
+              <button class="btn-micro" onclick="app.openModal('addFoodModal', 'Dinner')">+ Add Food</button>
+            </div>
+            <div class="meal-items-list" id="dinnerItems">
+              <!-- Items injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Snacks & Post-Workout -->
+          <div class="card meal-card">
+            <div class="meal-card-header">
+              <div class="meal-type-title">
+                <span class="meal-icon">⚡</span>
+                <div>
+                  <h3 class="meal-name">Snacks & Recovery</h3>
+                  <span class="meal-sub" id="snacksCalories">130 kcal</span>
+                </div>
+              </div>
+              <button class="btn-micro" onclick="app.openModal('addFoodModal', 'Snacks')">+ Add Food</button>
+            </div>
+            <div class="meal-items-list" id="snacksItems">
+              <!-- Items injected dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Search Food Library Table -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Quick-Log Food Database</h3>
+              <p class="text-dim text-sm">Select any verified healthy whole food item to immediately add it to your daily intake.</p>
+            </div>
+            <div class="search-input-wrap">
+              <input type="text" id="foodSearchInput" class="form-input form-input-sm" placeholder="Search chicken, eggs, rice..." oninput="app.filterFoodLibrary()">
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="luxury-table">
+              <thead>
+                <tr>
+                  <th>Food Item</th>
+                  <th>Category</th>
+                  <th>Serving Size</th>
+                  <th>Calories</th>
+                  <th>Protein</th>
+                  <th>Carbs</th>
+                  <th>Fats</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="foodLibraryTableBody">
+                <!-- Dynamically populated from food dictionary -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 5: PROTEIN INTAKE MONITOR
+         ======================================================== -->
+    <section class="view-panel" id="view-protein">
+      <div class="container">
+        <div class="section-title-wrap">
+          <span class="section-badge">ANABOLIC ACCELERATOR</span>
+          <h1 class="section-title">Protein Intake <span class="gold-text">Monitoring System</span></h1>
+          <p class="section-desc">Optimize muscle protein synthesis (MPS), accelerate recovery, and ensure you meet your optimal 1.6 - 2.2g per kg bodyweight target.</p>
+        </div>
+
+        <div class="protein-monitor-grid">
+          <!-- Main Protein Progress Card -->
+          <div class="card card-gold-glow">
+            <div class="card-header">
+              <h2 class="card-title">Today's Protein Status</h2>
+              <span class="badge-tag gold-border" id="proteinOptimalRatio">1.7 g / kg</span>
+            </div>
+
+            <div class="protein-visual-progress">
+              <div class="protein-ring-wrap">
+                <svg viewBox="0 0 180 180" class="ring-svg">
+                  <circle cx="90" cy="90" r="74" class="ring-track"></circle>
+                  <circle cx="90" cy="90" r="74" class="ring-fill gold-ring" id="proteinProgressRing" style="stroke-dasharray: 465; stroke-dashoffset: 116;"></circle>
+                </svg>
+                <div class="ring-content">
+                  <span class="ring-number gold-text" id="proteinRingVal">120</span>
+                  <span class="ring-unit">grams</span>
+                  <span class="ring-sub" id="proteinRingGoal">of 160g goal</span>
+                </div>
+              </div>
+
+              <div class="protein-ring-details">
+                <div class="stat-row">
+                  <span class="stat-lbl">Remaining to Goal:</span>
+                  <span class="stat-data gold-text" id="proteinRemainingVal">40g</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-lbl">Target Factor:</span>
+                  <span class="stat-data" id="proteinPerKgVal">2.2 g / kg (Hypertrophy)</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-lbl">Protein Calories:</span>
+                  <span class="stat-data" id="proteinCaloriesVal">480 kcal (28.5% of total)</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-lbl">MPS Distribution:</span>
+                  <span class="stat-data text-green">Optimal (Spread over 3+ meals)</span>
+                </div>
+
+                <div class="quick-protein-add-btns mt-3">
+                  <span class="text-xs text-dim block mb-1">Quick Add High-Protein Snack:</span>
+                  <button class="btn-micro" onclick="app.logQuickProtein('Whey Protein Scoop', 25, 120)">+25g Whey</button>
+                  <button class="btn-micro" onclick="app.logQuickProtein('Boiled Eggs (2)', 12, 140)">+12g 2 Eggs</button>
+                  <button class="btn-micro" onclick="app.logQuickProtein('Greek Yogurt (1 cup)', 17, 130)">+17g Yogurt</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- High-Protein Food Suggestions & Recipes -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Top High-Protein Fuel Sources</h2>
+              <span class="badge-tag">Density Guide</span>
+            </div>
+
+            <div class="protein-food-cards">
+              <div class="protein-food-item">
+                <div class="p-food-badge">31g P / 100g</div>
+                <div class="p-food-info">
+                  <h4 class="p-food-name">Chicken Breast (Skinless)</h4>
+                  <p class="p-food-sub">165 kcal • Lean, virtually zero carb & fat. Gold standard for cuts.</p>
+                </div>
+              </div>
+              <div class="protein-food-item">
+                <div class="p-food-badge">26g P / 100g</div>
+                <div class="p-food-info">
+                  <h4 class="p-food-name">Atlantic Salmon Fillet</h4>
+                  <p class="p-food-sub">208 kcal • High bioavailability, rich in anti-inflammatory Omega-3.</p>
+                </div>
+              </div>
+              <div class="protein-food-item">
+                <div class="p-food-badge">24g P / 1 Scoop</div>
+                <div class="p-food-info">
+                  <h4 class="p-food-name">Whey Isolate Protein</h4>
+                  <p class="p-food-sub">110 kcal • Rapid gastric absorption, peak leucine for muscle protein synthesis.</p>
+                </div>
+              </div>
+              <div class="protein-food-item">
+                <div class="p-food-badge">18g P / 100g</div>
+                <div class="p-food-info">
+                  <h4 class="p-food-name">Paneer / Tofu (Firm)</h4>
+                  <p class="p-food-sub">260 kcal • Excellent calcium and slow-digesting vegetarian protein.</p>
+                </div>
+              </div>
+              <div class="protein-food-item">
+                <div class="p-food-badge">10g P / 100g</div>
+                <div class="p-food-info">
+                  <h4 class="p-food-name">Greek Yogurt (0% Fat)</h4>
+                  <p class="p-food-sub">59 kcal • Rich in casein protein, probiotics, and healthy minerals.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 6: WATER INTAKE MONITORING
+         ======================================================== -->
+    <section class="view-panel" id="view-water">
+      <div class="container">
+        <div class="section-title-wrap">
+          <span class="section-badge">CELLULAR HYDRATION</span>
+          <h1 class="section-title">Hydration & Water <span class="gold-text">Intake Tracker</span></h1>
+          <p class="section-desc">Proper hydration improves cognitive function, enhances physical strength, aids digestion, and keeps energy levels peak.</p>
+        </div>
+
+        <div class="water-tracker-grid">
+          <!-- Left: Animated Water Bottle & Quick Add -->
+          <div class="card card-gold-glow text-center">
+            <div class="card-header justify-center">
+              <h2 class="card-title">Hydration Progress</h2>
+            </div>
+
+            <!-- Interactive Water Bottle / Glass Container -->
+            <div class="water-bottle-container">
+              <div class="bottle-lid"></div>
+              <div class="bottle-body">
+                <div class="water-liquid" id="waterLiquid" style="height: 80%;">
+                  <div class="water-wave wave-1"></div>
+                  <div class="water-wave wave-2"></div>
+                </div>
+                <div class="bottle-readout">
+                  <span class="bottle-readout-val" id="waterBottleVal">2,400</span>
+                  <span class="bottle-readout-unit">ML</span>
+                  <span class="bottle-readout-pct" id="waterBottlePct">80%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="water-progress-text mt-3">
+              <h3 class="water-status-label" id="waterStatusText">Excellent Hydration!</h3>
+              <p class="text-dim text-sm"><span id="waterRemainingMl" class="gold-text">600 ml</span> remaining to achieve your daily 3,000 ml goal.</p>
+            </div>
+
+            <!-- Quick Add Action Buttons -->
+            <div class="water-quick-buttons mt-4">
+              <button class="btn btn-water" onclick="app.quickAddWater(250)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                +250 ml (1 Cup)
+              </button>
+              <button class="btn btn-water" onclick="app.quickAddWater(500)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                +500 ml (Bottle)
+              </button>
+              <button class="btn btn-water" onclick="app.quickAddWater(1000)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                +1,000 ml (1 Liter)
+              </button>
+              <button class="btn btn-outline" onclick="app.resetWater()">
+                Reset Day
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Daily Schedule & Hydration Benefits -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Hydration Target Settings</h2>
+            </div>
+
+            <div class="water-target-config">
+              <div class="form-group">
+                <label class="form-label" for="waterGoalInput">Custom Daily Water Target (ml)</label>
+                <div class="input-with-affix">
+                  <input type="number" id="waterGoalInput" class="form-input" min="1000" max="6000" step="100" value="3000">
+                  <span class="input-affix">ml</span>
+                </div>
+                <button class="btn btn-gold btn-sm mt-2" onclick="app.updateWaterGoal()">Save Water Target</button>
+              </div>
+
+              <div class="water-milestones mt-4">
+                <h4 class="sub-heading">Daily Hydration Milestones</h4>
+                <div class="milestone-list">
+                  <div class="milestone-item completed" id="waterMilestoneMorning">
+                    <span class="m-icon">✓</span>
+                    <div class="m-text">
+                      <strong>Morning Activation (500 ml)</strong>
+                      <span class="text-xs text-dim">Drink upon waking up to jumpstart metabolism.</span>
+                    </div>
+                  </div>
+                  <div class="milestone-item completed" id="waterMilestonePreWorkout">
+                    <span class="m-icon">✓</span>
+                    <div class="m-text">
+                      <strong>Pre-Workout Prime (500 ml)</strong>
+                      <span class="text-xs text-dim">1 hour prior to training session.</span>
+                    </div>
+                  </div>
+                  <div class="milestone-item completed" id="waterMilestoneIntra">
+                    <span class="m-icon">✓</span>
+                    <div class="m-text">
+                      <strong>Intra-Workout Replenishment (750 ml)</strong>
+                      <span class="text-xs text-dim">Sip periodically during sets and cardio.</span>
+                    </div>
+                  </div>
+                  <div class="milestone-item" id="waterMilestoneEvening">
+                    <span class="m-icon">○</span>
+                    <div class="m-text">
+                      <strong>Evening Balance (750 - 1000 ml)</strong>
+                      <span class="text-xs text-dim">Taper down 1-2 hours prior to sleep.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Science Tip Card -->
+              <div class="tip-card mt-3">
+                <div class="tip-header">
+                  <span class="tip-badge">HYDRATION SCIENCE</span>
+                </div>
+                <p class="tip-body">A 2% drop in cellular hydration decreases muscular endurance and explosive power by up to 15%. Drinking adequate electrolytes with your water ensures optimal muscular contraction.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 7: WORKOUT PLANNER
+         ======================================================== -->
+    <section class="view-panel" id="view-workouts">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="section-header-row">
+            <div>
+              <span class="section-badge">POWER & PERFORMANCE</span>
+              <h1 class="section-title">Workout Planner & <span class="gold-text">Exercise Routine</span></h1>
+              <p class="section-desc">Build customized training splits, record sets/reps/weights, track calories burned, and log exercise completion streaks.</p>
+            </div>
+            <div class="section-actions">
+              <button class="btn btn-gold" onclick="app.openModal('customExerciseModal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                + Create Custom Exercise
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Tags -->
+        <div class="workout-filter-bar">
+          <button class="filter-chip active" onclick="app.filterWorkouts('all')">All Exercises</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Chest')">Chest</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Back')">Back & Lats</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Legs')">Legs & Glutes</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Shoulders')">Shoulders</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Arms')">Biceps & Triceps</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Core')">Core & Abs</button>
+          <button class="filter-chip" onclick="app.filterWorkouts('Cardio')">Cardio & HIIT</button>
+        </div>
+
+        <!-- Pre-built Workout Programs Cards -->
+        <div class="workout-programs-grid mb-4">
+          <div class="card program-card" onclick="app.loadPresetRoutine('push')">
+            <div class="program-tag">HYPERTROPHY</div>
+            <h3 class="program-title">Push Power (Chest, Delts, Triceps)</h3>
+            <p class="program-desc">Bench Press, Overhead Press, Incline DB, Tricep Rope Pushdowns.</p>
+            <div class="program-meta">
+              <span>⏱ 55 Mins</span>
+              <span>🔥 ~420 kcal</span>
+            </div>
+          </div>
+
+          <div class="card program-card" onclick="app.loadPresetRoutine('pull')">
+            <div class="program-tag">STRENGTH</div>
+            <h3 class="program-title">Pull Dominance (Back & Biceps)</h3>
+            <p class="program-desc">Deadlift, Barbell Rows, Lat Pulldown, Incline Dumbbell Curls.</p>
+            <div class="program-meta">
+              <span>⏱ 60 Mins</span>
+              <span>🔥 ~480 kcal</span>
+            </div>
+          </div>
+
+          <div class="card program-card" onclick="app.loadPresetRoutine('legs')">
+            <div class="program-tag">LOWER BODY</div>
+            <h3 class="program-title">Leg Annihilation (Quads & Hamstrings)</h3>
+            <p class="program-desc">Barbell Back Squats, Romanian Deadlifts, Bulgarian Splits, Calves.</p>
+            <div class="program-meta">
+              <span>⏱ 65 Mins</span>
+              <span>🔥 ~550 kcal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Workout Session Logging Panel -->
+        <div class="card card-gold-glow mb-4" id="activeWorkoutCard">
+          <div class="card-header">
+            <div>
+              <span class="badge-tag gold-border">ACTIVE WORKOUT LOG</span>
+              <h2 class="card-title" id="activeRoutineTitle">Today's Training Session</h2>
+            </div>
+            <div class="workout-timer-box">
+              <span class="timer-display" id="workoutTimerDisplay">00:45:00</span>
+              <button class="btn-micro" id="timerToggleBtn" onclick="app.toggleWorkoutTimer()">Pause</button>
+            </div>
+          </div>
+
+          <div class="active-exercises-table-wrap">
+            <table class="luxury-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Exercise</th>
+                  <th>Target Muscle</th>
+                  <th>Sets x Reps</th>
+                  <th>Weight (kg)</th>
+                  <th>Est. Burn</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="activeWorkoutList">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer-actions">
+            <button class="btn btn-gold" onclick="app.finishWorkoutSession()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Complete Workout & Record Burn
+            </button>
+          </div>
+        </div>
+
+        <!-- Exercise Library Directory -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Comprehensive Exercise Encyclopedia</h3>
+            <span class="badge-tag" id="exerciseCountTag">40+ Exercises Available</span>
+          </div>
+          <div class="exercise-cards-grid" id="exerciseLibraryCards">
+            <!-- Populated dynamically with rich exercise cards -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 8: PERSONAL PROFILE MANAGEMENT
+         ======================================================== -->
+    <section class="view-panel" id="view-profile">
+      <div class="container">
+        <div class="section-title-wrap">
+          <span class="section-badge">ATHLETE IDENTITY</span>
+          <h1 class="section-title">Personal Profile & <span class="gold-text">Health Goals</span></h1>
+          <p class="section-desc">Manage your biometric vitals, personal target goals, dietary preferences, and system data backups.</p>
+        </div>
+
+        <div class="profile-layout-grid">
+          <!-- Left: Profile Edit Form -->
+          <div class="card card-gold-glow">
+            <div class="card-header">
+              <h2 class="card-title">Edit Biometrics & Vitals</h2>
+            </div>
+
+            <form id="profileForm" onsubmit="event.preventDefault(); app.saveProfile();">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="profName">Full Name / Athlete Handle</label>
+                  <input type="text" id="profName" class="form-input" value="Fit Athlete" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profAge">Age (Years)</label>
+                  <input type="number" id="profAge" class="form-input" min="12" max="110" value="25" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="profGender">Gender</label>
+                  <select id="profGender" class="form-select">
+                    <option value="male" selected>Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profHeight">Height (cm)</label>
+                  <div class="input-with-affix">
+                    <input type="number" id="profHeight" class="form-input" min="100" max="250" value="175" required>
+                    <span class="input-affix">cm</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="profCurrentWeight">Current Weight (kg)</label>
+                  <div class="input-with-affix">
+                    <input type="number" id="profCurrentWeight" class="form-input" min="30" max="300" step="0.1" value="72.0" required>
+                    <span class="input-affix">kg</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profTargetWeight">Target Goal Weight (kg)</label>
+                  <div class="input-with-affix">
+                    <input type="number" id="profTargetWeight" class="form-input" min="30" max="300" step="0.1" value="76.0" required>
+                    <span class="input-affix">kg</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="profFitnessGoal">Primary Fitness Goal</label>
+                  <select id="profFitnessGoal" class="form-select">
+                    <option value="Muscle Gain" selected>Muscle Gain (Hypertrophy)</option>
+                    <option value="Weight Loss">Weight Loss & Fat Burn</option>
+                    <option value="Endurance">Athletic Endurance & Stamina</option>
+                    <option value="Maintenance">Health Maintenance & Longevity</option>
+                    <option value="Strength">Max Strength & Powerlifting</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profActivityLevel">Daily Activity Multiplier</label>
+                  <select id="profActivityLevel" class="form-select">
+                    <option value="1.2">Sedentary (Desk Job)</option>
+                    <option value="1.375">Light (1-3 workouts / wk)</option>
+                    <option value="1.55" selected>Moderate (3-5 workouts / wk)</option>
+                    <option value="1.725">Heavy (6-7 intense sessions)</option>
+                    <option value="1.9">Elite Athlete</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profDietPref">Dietary Preference</label>
+                <select id="profDietPref" class="form-select">
+                  <option value="High Protein Omnivore" selected>High Protein Omnivore (Poultry, Meat, Fish, Dairy)</option>
+                  <option value="Vegetarian">High Protein Vegetarian (Paneer, Whey, Legumes, Dairy)</option>
+                  <option value="Vegan">Plant-Based / Vegan (Tofu, Tempeh, Lentils, Plant Protein)</option>
+                  <option value="Keto">Ketogenic / Low-Carb High-Fat</option>
+                </select>
+              </div>
+
+              <div class="mt-4">
+                <button type="submit" class="btn btn-gold w-100">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+                  Save Profile & Recalculate Recommendations
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Profile Card & System Data Management -->
+          <div class="profile-right-col">
+            <!-- Athlete Badge Card -->
+            <div class="card athlete-badge-card">
+              <div class="athlete-avatar-large">
+                <span id="profLargeInitials">FA</span>
+              </div>
+              <h3 class="athlete-name" id="profBadgeName">Fit Athlete</h3>
+              <span class="athlete-goal-pill" id="profBadgeGoal">Muscle Gain</span>
+              
+              <div class="athlete-stats-grid">
+                <div class="a-stat">
+                  <span class="a-stat-label">Height</span>
+                  <span class="a-stat-val" id="profBadgeHeight">175 cm</span>
+                </div>
+                <div class="a-stat">
+                  <span class="a-stat-label">Weight</span>
+                  <span class="a-stat-val" id="profBadgeWeight">72.0 kg</span>
+                </div>
+                <div class="a-stat">
+                  <span class="a-stat-label">BMI</span>
+                  <span class="a-stat-val gold-text" id="profBadgeBmi">23.5</span>
+                </div>
+                <div class="a-stat">
+                  <span class="a-stat-label">Calorie Goal</span>
+                  <span class="a-stat-val gold-text" id="profBadgeCalGoal">2,450 kcal</span>
+                </div>
+              </div>
+
+              <!-- Quick Athlete Account Actions -->
+              <div class="w-100 mt-3" style="display:flex; gap:0.5rem;">
+                <button class="btn btn-outline-sm flex-1" onclick="app.openAuthModal('select')">
+                  👥 Switch Athlete
+                </button>
+                <button class="btn btn-outline-sm flex-1" onclick="app.openAuthModal('register')">
+                  ➕ Add New User
+                </button>
+                <button class="btn-micro" onclick="app.logout()" style="color:#f87171; border-color:rgba(248,113,113,0.3);" title="Log out">
+                  🚪 Logout
+                </button>
+              </div>
+            </div>
+
+            <!-- Data Export & Import / Reset Card -->
+            <div class="card mt-3">
+              <div class="card-header">
+                <h3 class="card-title">Data Storage & Backup</h3>
+              </div>
+              <p class="text-dim text-sm mb-3">Your fitness activities, nutrition logs, and biometric configurations are stored locally and synchronized with the Fitora database.</p>
+              
+              <div class="data-actions-vertical">
+                <button class="btn btn-outline w-100" onclick="app.exportUserData()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Export Data Backup (JSON)
+                </button>
+                <button class="btn btn-outline w-100" onclick="document.getElementById('importFileInput').click()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  Import Data Backup
+                </button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="app.importUserData(event)">
+                <button class="btn btn-danger-subtle w-100" onclick="app.resetAllData()">
+                  Reset to Default Demo Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       MODALS
+       ======================================================== -->
+  <!-- 1. Quick Log Modal -->
+  <div class="modal-backdrop" id="quickLogModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ Quick Log Activity</h3>
+        <button class="modal-close" onclick="app.closeModal('quickLogModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="quick-log-options">
+          <button class="quick-opt-btn" onclick="app.closeModal('quickLogModal'); app.openModal('addFoodModal');">
+            <span class="opt-icon">🥗</span>
+            <div class="opt-text">
+              <strong>Log Food / Meal</strong>
+              <span>Add breakfast, lunch, dinner, or snack</span>
+            </div>
+          </button>
+          <button class="quick-opt-btn" onclick="app.closeModal('quickLogModal'); app.navigate('water');">
+            <span class="opt-icon">💧</span>
+            <div class="opt-text">
+              <strong>Add Water Intake</strong>
+              <span>Log cups, bottles or custom ml</span>
+            </div>
+          </button>
+          <button class="quick-opt-btn" onclick="app.closeModal('quickLogModal'); app.navigate('workouts');">
+            <span class="opt-icon">🏋️‍♂️</span>
+            <div class="opt-text">
+              <strong>Log Workout Session</strong>
+              <span>Track sets, reps, weight, and calories</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Add Food / Meal Modal -->
+  <div class="modal-backdrop" id="addFoodModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">🥗 Log Nutrition Entry</h3>
+        <button class="modal-close" onclick="app.closeModal('addFoodModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addFoodForm" onsubmit="event.preventDefault(); app.saveCustomFoodEntry();">
+          <div class="form-group">
+            <label class="form-label" for="foodMealSlot">Meal Category</label>
+            <select id="foodMealSlot" class="form-select">
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Snacks">Snacks & Pre/Post Workout</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="foodPresetSelect">Select From Verified Food List (Or type custom)</label>
+            <select id="foodPresetSelect" class="form-select" onchange="app.fillFoodFromPreset()">
+              <option value="">-- Choose verified item --</option>
+              <!-- Filled via JavaScript -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="foodNameInput">Food / Recipe Name</label>
+            <input type="text" id="foodNameInput" class="form-input" placeholder="e.g. Grilled Chicken Salad" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="foodCaloriesInput">Calories (kcal)</label>
+              <input type="number" id="foodCaloriesInput" class="form-input" min="0" placeholder="e.g. 350" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="foodProteinInput">Protein (g)</label>
+              <input type="number" id="foodProteinInput" class="form-input" min="0" step="0.1" placeholder="e.g. 35" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="foodCarbsInput">Carbs (g)</label>
+              <input type="number" id="foodCarbsInput" class="form-input" min="0" step="0.1" placeholder="e.g. 20" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="foodFatsInput">Fats (g)</label>
+              <input type="number" id="foodFatsInput" class="form-input" min="0" step="0.1" placeholder="e.g. 5" value="0">
+            </div>
+          </div>
+
+          <div class="modal-footer mt-4">
+            <button type="button" class="btn btn-outline" onclick="app.closeModal('addFoodModal')">Cancel</button>
+            <button type="submit" class="btn btn-gold">Log Meal Entry</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Create Custom Exercise Modal -->
+  <div class="modal-backdrop" id="customExerciseModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">🏋️‍♂️ Add Custom Exercise</h3>
+        <button class="modal-close" onclick="app.closeModal('customExerciseModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="customExerciseForm" onsubmit="event.preventDefault(); app.saveCustomExercise();">
+          <div class="form-group">
+            <label class="form-label" for="exNameInput">Exercise Name</label>
+            <input type="text" id="exNameInput" class="form-input" placeholder="e.g. Romanian Dumbbell Deadlift" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="exMuscleSelect">Target Muscle Group</label>
+              <select id="exMuscleSelect" class="form-select">
+                <option value="Chest">Chest</option>
+                <option value="Back">Back</option>
+                <option value="Legs">Legs</option>
+                <option value="Shoulders">Shoulders</option>
+                <option value="Arms">Arms</option>
+                <option value="Core">Core</option>
+                <option value="Cardio">Cardio</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="exSetsInput">Default Sets x Reps</label>
+              <input type="text" id="exSetsInput" class="form-input" placeholder="e.g. 4 x 10" value="3 x 10" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="exWeightInput">Default Weight (kg)</label>
+              <input type="number" id="exWeightInput" class="form-input" min="0" step="0.5" value="20">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="exBurnInput">Est. Calories Burned</label>
+              <input type="number" id="exBurnInput" class="form-input" min="0" value="80">
+            </div>
+          </div>
+
+          <div class="modal-footer mt-4">
+            <button type="button" class="btn btn-outline" onclick="app.closeModal('customExerciseModal')">Cancel</button>
+            <button type="submit" class="btn btn-gold">Save & Add to Session</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <span class="gold-text font-bold">FITORA</span> — The Elite Fitness and Nutrition Management Platform
+      </div>
+      <div class="footer-copy">
+        Crafted with precision in HTML, CSS, JavaScript & Python. Keep grinding.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
